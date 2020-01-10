@@ -20,6 +20,7 @@ except ImportError:
 
 class PressureController:
     def __init__(self, address_string):
+		'''A class for a Mensor pressure controller. Initialize with an address string such as 'GPIB::1::INSTR' or other GPIB address.'''
         self.Address = address_string
         rm = visa.ResourceManager()
         self.instrument = rm.open_resource(self.Address)
