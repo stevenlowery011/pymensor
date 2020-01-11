@@ -6,3 +6,5 @@ dist
 .vs/
 *.sln
 *.pyproj
+*.ipynb
+.ipynb_checkpoints/
