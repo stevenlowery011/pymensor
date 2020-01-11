@@ -1,13 +1,14 @@
+"""Setup module for pymensor."""
 from setuptools import setup
 
 with open('README.md', 'r') as in_file:
-    long_description = in_file.read()
+    LONG_DESCRIPTION = in_file.read()
 
 setup(
     name="pymensor",
     version="0.0.1",
     description="Python driver for Mensor Modular Pressure Controllers.",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     url="https://github.com/stevenlowery011/pymensor.git",
     author="Steven Lowery",
