@@ -1,4 +1,3 @@
-import setuptools
 from setuptools import setup
 
 with open('README.md', 'r') as in_file:

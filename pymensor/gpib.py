@@ -19,14 +19,50 @@ except ImportError:
     pass
 
 class PressureController:
+    """Python driver for Mensor Pressure Controllers.
+
+    [Reference](https://www.mensor.com/products_pressure_controllers_en_co.WIKA).
+
+    This class communicates with the pressure controller over a GPIB connection using pyvisa.
+
+    inheritance:
+    none
+
+    methods:
+    ping()
+    setActiveChannel(channel)
+    setActiveChannelDifferential()
+    setUnit(unitCode)
+    setMode(mode)
+    setMeasType(mtype)
+    setLimit(upper, lower)
+    setPoint(setpt)
+    is_stable()
+    readPressure()
+    """
     def __init__(self, address_string):
-		'''A class for a Mensor pressure controller. Initialize with an address string such as 'GPIB::1::INSTR' or other GPIB address.'''
+        """Initialize a GPIB-connected pressure controller with an address string 
+        such as 'GPIB::1::INSTR' or other GPIB address.
+        
+        args:
+        adress_string: (string) the GPIB address of the device
+
+        return:
+        PressureController object
+        """
         self.Address = address_string
         rm = visa.ResourceManager()
         self.instrument = rm.open_resource(self.Address)
     
     def ping(self):
-        '''Check communication with pressure controller. Returns 'True' or 'Error:' '''
+        """Check communication with pressure controller. 
+        
+        args:
+        none
+
+        return:
+        True or 'Error'
+        """
         response = self.instrument.query('*IDN?\r')
         if "MENSOR, 600,610189,0.1.5" not in response:
             return "Error: Pressure Controller did not respond!"
@@ -35,18 +71,40 @@ class PressureController:
         
         
     def setActiveChannel(self, channel):
-        '''Sets active channel'''
+        """Sets active channel on modular pressure controllers.
+        Must be 'A' or 'B'.
+        
+        args:
+        channel: (char) 'A' or 'B'
+
+        return:
+        self.instrument.last_status
+        """
         self.instrument.write('Chan ' + channel + '\r')
         return self.instrument.last_status
     
     def setActiveChannelDifferential(self):
-        '''Sets active channel as differential channel'''
+        """Makes the active channel a differential channel.
+        
+        args:
+        none
+
+        return:
+        self.instrument.last_status
+        """
         self.instrument.write('Chan D\r') # sets the active channel as differential channel
         return self.instrument.last_status
             
     def setUnit(self, unitCode):
-        '''Sets unit of the active channel
-        Code Description 							Output Format
+        """Sets unit of the active channel using unitCode described below.
+
+        args:
+        unitCode: (int) the integer unit code from the table below
+
+        return:
+        self.instrument.last_status
+
+        Code    Description 							 Output Format
             1   pounds per square inch ..................psi
             2   inches of mercury @0C ...................inHg @0C
             3   inches of mercury @60F ..................inHg @60F
@@ -80,18 +138,34 @@ class PressureController:
             31  percent of full scale ...................%FS
             32  micron Hg @0C ...........................micronHg @0C
             33  ton per square inch .....................tons/sq in
-            34  n/a .....................................n/a'''
-        # To Do: Implement unit format instead of code?
+            34  n/a .....................................n/a
+            """
+        # TODO: Implement unit format instead of code?
         self.instrument.write('Units ' + str(unitCode) + '\r')
         return self.instrument.last_status
         
     def setMode(self, mode):
-        '''Sets mode to : Standby, Measure, Control or Vent'''
+        """Sets mode to : Standby, Measure, Control or Vent.
+        
+        args:
+        mode: (string) "standby", "measure", "control", or "vent"
+
+        return:
+        self.instrument.last_status
+        """
         self.instrument.write('Mode '+ mode + '\r')
         return self.instrument.last_status
         
     def setMeasType(self, mtype):
-        '''Sets the measurement type: Absolute, Gauge or Differential'''
+        """Sets the measurement type: Absolute, Gauge or Differential.
+        
+        args:
+        mtype: (string) "Absolute" (or 'A'), "Gauge" (or 'G'), or "Differential" (or 'D')
+
+        return:
+        self.instrument.last_status
+        """
+        # TODO: implement case conversion so mixed/lower case works as well
         if mtype is 'Absolute' or 'A':
             self.instrument.write('Ptype A\r')
         elif mtype is 'Gauge' or 'G':
@@ -103,18 +177,43 @@ class PressureController:
         return self.instrument.last_status
     
     def setLimit(self, upper, lower):
-        ''''Sets upper and lower control limit for the active channel'''
+        """Sets upper and lower control limit for the active channel.
+        
+        args:
+        upper: (string) upper control limit as a value
+        lower: (string) lower control limit as a value
+
+        return:
+        self.instrument.last_status
+        """
+        # TODO: take in float values instead of strings
         self.instrument.write('UpperLimit'+ str(upper))
         self.instrument.write('LowerLimit'+ str(lower))
         return self.instrument.last_status
     
-    def setPoint(self,setpt):
-        ''' Set the setpoint on current channel on current units'''
+    def setPoint(self, setpt):
+        """Set the setpoint on current channel on current units.
+        
+        args:
+        setpt: (string) the desired setpoint as a value
+
+        return:
+        self.instrument.last_status
+        """
+        # TODO: take in float values instead of strings
         self.instrument.write('Setpt ' + setpt + '\r')
         return self.instrument.last_status
     
     def is_stable(self):
-        '''Returns TRUE if instrument is stable or FALSE if not'''
+        """Check if the control value has stabilized.
+        
+        args:
+        none
+
+        return:
+        True if stable
+        False if not
+        """
         response = self.instrument.query('Stable?\r').strip('\n').strip('\r').strip('').lstrip('E').lstrip(' ')
         if response == 'YES':
             return True
@@ -124,8 +223,16 @@ class PressureController:
             return "Error!No response from the instruemnt :" + response
         
     def readPressure(self, units = False):
-        '''Returns current pressure reading on active channel. units = True returns the unit of measurement
-        separated by comma '''
+        """Returns current pressure reading on active channel. If units=True then returns the unit of measurement
+        separated by comma.
+        
+        args:
+        (optional) units: (bool) set to True to return the units along with pressure reading. Default=False.
+
+        return:
+        curr_reading
+        """
+        # TODO: make return type same regardless. Choose to return units another way.
         curr_reading = 0
         curr_chan = self.instrument.query('Chan?\r').rstrip('\r').strip('\n').lstrip('E').strip('').rstrip('\r').lstrip(' ')
         #print(curr_chan)
@@ -134,10 +241,11 @@ class PressureController:
             curr_reading = float(strValue.strip('\n').rstrip('\r').lstrip('E').lstrip('E').lstrip(' '))
         elif curr_chan == 'B':
             strValue = self.instrument.query('B?\r')
-            curr_reading = float(strValue.strip('\n').rstrip('\r').lstrip('E').lstrip(' '))
-            
+            curr_reading = float(strValue.strip('\n').rstrip('\r').lstrip('E').lstrip(' ')) 
+        
         if units is True:
             strValue = self.instrument.query('Units?\r')
             unit = strValue.strip('\n').strip('\r').lstrip('E').lstrip(' ')
             return str(curr_reading) + ',' + str(unit)
         return curr_reading
+    
