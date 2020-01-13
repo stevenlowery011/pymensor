@@ -6,7 +6,7 @@ with open('README.md', 'r') as in_file:
 
 setup(
     name="pymensor",
-    version="0.0.1",
+    version="0.0.2",
     description="Python driver for Mensor Modular Pressure Controllers.",
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
@@ -18,7 +18,7 @@ setup(
     license="GPLv3",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Human Machine Interfaces",

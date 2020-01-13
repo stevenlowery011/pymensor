@@ -8,3 +8,4 @@ dist
 *.pyproj
 *.ipynb
 .ipynb_checkpoints/
+.mypy_cache/

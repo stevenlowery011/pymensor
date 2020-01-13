@@ -61,14 +61,14 @@ class PressureController:
         none
 
         return:
-        True or 'Error'
+        True if instrument responded
         """
+        # TODO: validate if a Mensor instrument is connected
         response = self.instrument.query('*IDN?\r')
         if "MENSOR, 600,610189,0.1.5" not in response:
-            return_val = "Error: Pressure Controller did not respond!"
-        else:
-            return_val = True
-        return return_val
+            raise RuntimeError("A Mensor pressure controller did not respond! \
+                                Got response: {}".format(response))
+        return True
 
     def set_active_channel(self, channel):
         """Sets active channel on modular pressure controllers.
@@ -80,6 +80,9 @@ class PressureController:
         return:
         self.instrument.last_status
         """
+        channel = channel.upper()
+        if channel not in ('A', 'B'):
+            raise ValueError("Input must be 'A' or 'B'")
         self.instrument.write('Chan ' + channel + '\r')
         return self.instrument.last_status
 
@@ -141,6 +144,8 @@ class PressureController:
             34  n/a .....................................n/a
             """
         # TODO: Implement unit format instead of code?
+        if unit_code not in range(1, 35):
+            raise ValueError("Unit code not supported. See instrument's user's manual.")
         self.instrument.write('Units ' + str(unit_code) + '\r')
         return self.instrument.last_status
 
@@ -165,17 +170,16 @@ class PressureController:
         return:
         self.instrument.last_status
         """
-        # TODO: implement case conversion so mixed/lower case works as well
-        return_val = self.instrument.last_status
-        if mtype in ('Absolute', 'A'):
+        mtype = mtype.upper()
+        if mtype not in ('ABSOLUTE', 'A', 'GAUGE', 'G', 'DIFFERENTIAL', 'D'):
+            raise ValueError("Input must be Absolute, Gauge, or Differential.")
+        if mtype in ('ABSOLUTE', 'A'):
             self.instrument.write('Ptype A\r')
-        elif mtype in ('Gauge', 'G'):
+        elif mtype in ('GAUGE', 'G'):
             self.instrument.write('Ptype G\r')
-        elif mtype in ('Differential', 'D'):
+        elif mtype in ('DIFFERENTIAL', 'D'):
             self.instrument.write('Chan D\r')
-        else:
-            return_val = 'Error: Enter correct measurement type'
-        return return_val
+        return self.instrument.last_status
 
     def set_limit(self, upper, lower):
         """Sets upper and lower control limit for the active channel.
@@ -187,7 +191,11 @@ class PressureController:
         return:
         self.instrument.last_status
         """
-        # TODO: take in float values instead of strings
+        # TODO: add option for setting just one of the limits
+        if not isinstance(upper, (int, float)):
+            raise TypeError("Input must be of type int or float.")
+        if not isinstance(lower, (int, float)):
+            raise TypeError("Input must be of type int or float.")
         self.instrument.write('UpperLimit'+ str(upper))
         self.instrument.write('LowerLimit'+ str(lower))
         return self.instrument.last_status
@@ -201,8 +209,9 @@ class PressureController:
         return:
         self.instrument.last_status
         """
-        # TODO: take in float values instead of strings
-        self.instrument.write('Setpt ' + setpt + '\r')
+        if not isinstance(setpt, (int, float)):
+            raise TypeError("Input must be of type int or float.")
+        self.instrument.write('Setpt ' + str(setpt) + '\r')
         return self.instrument.last_status
 
     def is_stable(self):
@@ -222,13 +231,15 @@ class PressureController:
         response = response.strip('')
         response = response.lstrip('E')
         response = response.lstrip(' ')
+        stable = None
         if response == 'YES':
-            return_val = True
+            stable = True
         elif response == 'NO':
-            return_val = False
+            stable = False
         else:
-            return_val = "Error!No response from the instruemnt :" + response
-        return return_val
+            raise RuntimeError("An unexpected response was received! \
+                                Got response: {}".format(response))
+        return stable
 
     def read_pressure(self, units=False):
         """Returns current pressure reading on active channel.
