@@ -1,5 +1,6 @@
 # pymensor
 
+<table>
 <tr>
     <td>Latest Release</td>
     <td>
@@ -8,6 +9,7 @@
         </a>
     </td>
 </tr>
+</table>
 
 This package is a GPIB (IEEE 488.2) driver for 
 [Mensor Modular Pressure Controllers](https://www.mensor.com/products_pressure_controllers_en_co.WIKA).
@@ -30,6 +32,13 @@ pip install pymensor
 # Dependencies
 
 This package depends on `pyvisa`.
+
+This package, along with PyVisa, depends on a VISA installation being present on the system.
+By default, PyVisa uses the IVI library as the backend, which can be installed with NI-VISA.
+Alternatively, you can install `pyvisa-py` as the backend instead of the IVI library. 
+In any case, the bitness of the VISA library **must match** the bitness of the Python installation.
+
+See the PyVisa documentation on [Configuring the Backend](https://pyvisa.readthedocs.io/en/latest/introduction/configuring.html).
 
 # Usage
 
