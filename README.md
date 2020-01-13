@@ -1,5 +1,14 @@
 # pymensor
 
+<tr>
+    <td>Latest Release</td>
+    <td>
+        <a href="https://pypi.org/project/pymensor/">
+        <img src="https://img.shields.io/pypi/v/pymensor" alt="latest release" />
+        </a>
+    </td>
+</tr>
+
 This package is a GPIB (IEEE 488.2) driver for 
 [Mensor Modular Pressure Controllers](https://www.mensor.com/products_pressure_controllers_en_co.WIKA).
 
